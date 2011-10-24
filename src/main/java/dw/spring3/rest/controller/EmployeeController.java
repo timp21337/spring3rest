@@ -1,6 +1,7 @@
 package dw.spring3.rest.controller;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.transform.Source;
@@ -35,10 +36,20 @@ public class EmployeeController {
 
 	private static final String XML_VIEW_NAME = "employees";
 	
+  @RequestMapping(method=RequestMethod.GET, value="/employees")
+  public ModelAndView getEmployees() {
+    List<Employee> employees = employeeDS.getAll();
+    EmployeeList list = new EmployeeList(employees);
+    return new ModelAndView(XML_VIEW_NAME, "employees", list);
+  }
+  
 	@RequestMapping(method=RequestMethod.GET, value="/employee/{id}")
 	public ModelAndView getEmployee(@PathVariable String id) {
 		Employee e = employeeDS.get(Long.parseLong(id));
-		return new ModelAndView(XML_VIEW_NAME, "object", e);
+		ArrayList<Employee> employees = new ArrayList<Employee>();
+		employees.add(e);
+    EmployeeList employeeList = new EmployeeList(employees);
+		return new ModelAndView(XML_VIEW_NAME, "object", e).addObject("employees", employeeList);
 	}
 	
 	@RequestMapping(method=RequestMethod.PUT, value="/employee/{id}")
@@ -65,11 +76,5 @@ public class EmployeeController {
 		return new ModelAndView(XML_VIEW_NAME, "employees", list);
 	}
 	
-	@RequestMapping(method=RequestMethod.GET, value="/employees")
-	public ModelAndView getEmployees() {
-		List<Employee> employees = employeeDS.getAll();
-		EmployeeList list = new EmployeeList(employees);
-		return new ModelAndView(XML_VIEW_NAME, "employees", list);
-	}
 	
 }
